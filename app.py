@@ -532,23 +532,23 @@ def download_rate():
     mid = data.get("mid")
     ts = data.get("ts")
 
-    template_path = os.path.join(os.path.dirname(__file__), "template.xlsx")
+    template_path = os.path.join(os.path.dirname(__file__), "exchange_rate_temp_hk.xlsx")
     wb = openpyxl.load_workbook(template_path)
-    ws = wb["模版"]
+    ws = wb["sheet1"]
 
     # 中間價寫入 D2, E2, F2, D3, E3, F3
     for cell in ["D2", "E2", "F2", "D3", "E3", "F3"]:
         ws[cell] = mid
 
-    # 更新時間寫入 G2, G3（含時間格式）
+    # 發布日期寫入 G2, G3（只存日期）
     try:
-        ts_dt = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
+        ts_dt = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").date()
     except Exception:
         ts_dt = ts
     ws["G2"] = ts_dt
     ws["G3"] = ts_dt
-    ws["G2"].number_format = "yyyy/mm/dd hh:mm:ss"
-    ws["G3"].number_format = "yyyy/mm/dd hh:mm:ss"
+    ws["G2"].number_format = "dd/mm/yyyy"
+    ws["G3"].number_format = "dd/mm/yyyy"
 
     buf = io.BytesIO()
     wb.save(buf)
@@ -557,7 +557,7 @@ def download_rate():
     return send_file(
         buf,
         as_attachment=True,
-        download_name="template.xlsx",
+        download_name="exchange_rate_temp_hk.xlsx",
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
