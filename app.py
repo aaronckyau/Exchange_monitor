@@ -417,7 +417,7 @@ async function useRate(source) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'template.xlsx';
+    a.download = 'exchange_rate_temp_hk.xlsx';
     a.click();
     URL.revokeObjectURL(url);
     btn.textContent = '✓ 已下載';
