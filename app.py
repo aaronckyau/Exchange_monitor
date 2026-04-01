@@ -1,7 +1,9 @@
 from flask import Flask, jsonify, render_template_string, request, send_file
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+HKT = timezone(timedelta(hours=8))
 import os
 import io
 import openpyxl
@@ -468,7 +470,7 @@ def get_boc_rate():
                     return {
                         "buy": texts[1],
                         "sell": texts[2],
-                        "ts": boc_ts or datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "ts": boc_ts or datetime.now(HKT).strftime("%Y-%m-%d %H:%M:%S"),
                         "error": False,
                     }
         return {"error": True, "msg": "USD row not found"}
@@ -484,7 +486,7 @@ def get_yfin_rate():
         price = ticker.fast_info["last_price"]
         return {
             "price": price,
-            "ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "ts": datetime.now(HKT).strftime("%Y-%m-%d %H:%M:%S"),
             "error": False,
         }
     except Exception as e:
@@ -500,7 +502,7 @@ def get_fmp_rate():
         if data and isinstance(data, list):
             price = data[0].get("price")
             ts_unix = data[0].get("timestamp")
-            ts = datetime.fromtimestamp(ts_unix).strftime("%Y-%m-%d %H:%M:%S") if ts_unix else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            ts = datetime.fromtimestamp(ts_unix, HKT).strftime("%Y-%m-%d %H:%M:%S") if ts_unix else datetime.now(HKT).strftime("%Y-%m-%d %H:%M:%S")
             return {
                 "price": price,
                 "ts": ts,
